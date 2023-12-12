@@ -1,0 +1,26 @@
+name: Build Package Manually
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    name: "${{ matrix.tag }} - ${{ matrix.build_env.pkgarch}} :: ${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}} build"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tag: ['v23.05.0']
+        build_env:
+          - pkgarch: mipsel_24kc
+            target: ramips
+            subtarget: mt7621
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: openwrt/openwrt
+          ref: ${{ matrix.tag }}
+          fetch-depth: 0
+
+      - name: Validate checked out repository
+        run: |
+          ls -al
+          git branch -v
+
