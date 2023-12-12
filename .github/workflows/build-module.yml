@@ -1,0 +1,78 @@
+name: Release AmneziaWG Kernel Module
+on: [workflow_dispatch]
+# on:
+#   push:
+#     tags:
+#       - "v*.*.*"
+
+jobs:
+  build:
+    name: "${{ matrix.tag }} - ${{ matrix.build_env.pkgarch}} :: ${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}} build"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tag: ['v23.05.0']
+        build_env:
+          - pkgarch: mipsel_24kc
+            target: ramips
+            subtarget: mt7621
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: openwrt/openwrt
+          ref: ${{ matrix.tag }}
+          fetch-depth: 0
+
+      - name: Building kernel and AmneziaWG module
+        run: |
+          pkgarch=${{ matrix.build_env.pkgarch}}
+          target=${{ matrix.build_env.target}}
+          subtarget=${{ matrix.build_env.subtarget}}
+
+          echo "pkgarch: ${pkgarch}, target: ${target}, subtarget: ${subtarget}"
+
+          echo "CONFIG_TARGET_${target}=y" > .config
+          echo "CONFIG_TARGET_${target}_${subtarget}=y" >> .config
+          echo "CONFIG_DEFAULT_TARGET_${target}_${subtarget}=y" >> .config
+          echo "CONFIG_ALL_KMODS=y" >> .config
+
+          echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
+
+          make defconfig
+
+          echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
+
+          ./scripts/feeds update awgopenwrt
+          ./scripts/feeds install -a -p awgopenwrt
+
+          echo "    > make defconfig"
+          make defconfig
+          echo "    > make tools/install"
+          make tools/install
+          echo "    > make toolchain/install"
+          make toolchain/install
+          # compile kernel module
+          echo "    > make target/linux/compile"
+          make target/linux/compile V=s
+
+          # Build kmod
+          echo "    > make kmod-amneziawg (clean)"
+          make package/kmod-amneziawg/clean V=s
+          echo "    > make kmod-amneziawg (download)"
+          make package/kmod-amneziawg/download V=s
+          echo "    > make kmod-amneziawg (prepare)"
+          make package/kmod-amneziawg/prepare V=s
+          echo "    > make kmod-amneziawg (compile)"
+          make package/kmod-amneziawg/compile V=s
+
+          # print
+          ls -al bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/
+
+      # - name: Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: |
+      #       bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg*.ipk
