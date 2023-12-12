@@ -1,5 +1,9 @@
-name: Build Package Manually
+name: Release compiled assets
 on: [workflow_dispatch]
+# on:
+#   push:
+#     tags:
+#       - "v*.*.*"
 
 jobs:
   build:
@@ -24,3 +28,10 @@ jobs:
           ls -al
           git branch -v
 
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "test release"
+          files: |
+            version
+            config
