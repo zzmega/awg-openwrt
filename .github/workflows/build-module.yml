@@ -72,23 +72,25 @@ jobs:
 
           echo "    > make amnezia-wg-tools (clean)"
           make package/amnezia-wg-tools/clean V=s
-          echo "    > make amnezia-wg-tools (download)"
-          make package/amnezia-wg-tools/download V=s
-          echo "    > make amnezia-wg-tools (prepare)"
-          make package/amnezia-wg-tools/prepare V=s
-          echo "    > make amnezia-wg-tools (compile)"
-          make package/amnezia-wg-tools/compile V=s
-
           echo "    > make luci-app-amneziawg (clean)"
           make package/luci-app-amneziawg/clean V=s
+
+          echo "    > make amnezia-wg-tools (download)"
+          make package/amnezia-wg-tools/download V=s
           echo "    > make luci-app-amneziawg (download)"
           make package/luci-app-amneziawg/download V=s
+
+          echo "    > make amnezia-wg-tools (prepare)"
+          make package/amnezia-wg-tools/prepare V=s
           echo "    > make luci-app-amneziawg (prepare)"
           make package/luci-app-amneziawg/prepare V=s
+
+          echo "    > make amnezia-wg-tools (compile)"
+          make package/amnezia-wg-tools/compile V=s
           echo "    > make luci-app-amneziawg (compile)"
           make package/luci-app-amneziawg/compile V=s
 
-          ls -al bin/packages/${{ matrix.build_env.target}}/base
+          ls -al bin/packages/${{ matrix.build_env.pkgarch }}/base
 
       - name: Building AmneziaWG module
         run: |
