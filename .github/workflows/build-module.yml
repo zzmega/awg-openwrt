@@ -63,19 +63,46 @@ jobs:
           echo "    > make target/linux/compile"
           make target/linux/compile V=s
 
+      - name: Building AmneziaWG Tools and Luci
+        run: |
+          ./scripts/feeds update luci
+          ./scripts/feeds install -a -p luci
+          ./scripts/feeds update awgopenwrt
+          ./scripts/feeds install -a -p awgopenwrt
+
+          echo "    > make amnezia-wg-tools (clean)"
+          make package/amnezia-wg-tools/clean V=s
+          echo "    > make amnezia-wg-tools (download)"
+          make package/amnezia-wg-tools/download V=s
+          echo "    > make amnezia-wg-tools (prepare)"
+          make package/amnezia-wg-tools/prepare V=s
+          echo "    > make amnezia-wg-tools (compile)"
+          make package/amnezia-wg-tools/compile V=s
+
+          echo "    > make luci-app-amneziawg (clean)"
+          make package/luci-app-amneziawg/clean V=s
+          echo "    > make luci-app-amneziawg (download)"
+          make package/luci-app-amneziawg/download V=s
+          echo "    > make luci-app-amneziawg (prepare)"
+          make package/luci-app-amneziawg/prepare V=s
+          echo "    > make luci-app-amneziawg (compile)"
+          make package/luci-app-amneziawg/compile V=s
+
+          ls -al bin/packages/${{ matrix.build_env.target}}/base
+
       - name: Building AmneziaWG module
         run: |
           ls -al
           # fixing feed
 
-          echo "src-git packages https://git.openwrt.org/feed/packages.git^0da9f622975aa1e4efe452da4acbae15479bee63" > ./feeds.conf.default
-          echo "src-git luci https://git.openwrt.org/project/luci.git^257f54cb8bcd493d9be0a45a3c316668b793e8ae" >> ./feeds.conf.default
-          echo "src-git routing https://git.openwrt.org/feed/routing.git^2272106e0839ee06957e88e3596489e1b510d3c2" >> ./feeds.conf.default
-          echo "src-git telephony https://git.openwrt.org/feed/telephony.git^9746ae8f964e18f04b64fbe1956366954ff223f8" >> ./feeds.conf.default
-          echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
+          # echo "src-git packages https://git.openwrt.org/feed/packages.git^0da9f622975aa1e4efe452da4acbae15479bee63" > ./feeds.conf.default
+          # echo "src-git luci https://git.openwrt.org/project/luci.git^257f54cb8bcd493d9be0a45a3c316668b793e8ae" >> ./feeds.conf.default
+          # echo "src-git routing https://git.openwrt.org/feed/routing.git^2272106e0839ee06957e88e3596489e1b510d3c2" >> ./feeds.conf.default
+          # echo "src-git telephony https://git.openwrt.org/feed/telephony.git^9746ae8f964e18f04b64fbe1956366954ff223f8" >> ./feeds.conf.default
+          # echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
 
-          ./scripts/feeds update awgopenwrt
-          ./scripts/feeds install -a -p awgopenwrt
+          # ./scripts/feeds update awgopenwrt
+          # ./scripts/feeds install -a -p awgopenwrt
 
           echo "    > make defconfig"
           make defconfig
@@ -93,11 +120,11 @@ jobs:
           # print
           ls -al bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/
 
-          # Cleanup feeds for the cache
-          echo "  > cleanup feeds"
-          tac feeds.conf.default | tail -n +2 | tac > feeds.conf.default
-          echo "  > print feeds"
-          cat feeds.conf.default
+          # # Cleanup feeds for the cache
+          # echo "  > cleanup feeds"
+          # tac feeds.conf.default | tail -n +2 | tac > feeds.conf.default
+          # echo "  > print feeds"
+          # cat feeds.conf.default
 
       # - name: Release
       #   uses: softprops/action-gh-release@v1
