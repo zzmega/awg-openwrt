@@ -23,7 +23,36 @@ jobs:
           ref: ${{ matrix.tag }}
           fetch-depth: 0
 
-      - name: Building kernel and AmneziaWG module
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: awg-openwrt
+
+      - name: Cache Tools and Kernel
+        id: cache-tools-kernel
+        uses: actions/cache@v3
+        env:
+          cache-name: "cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-${{ matrix.build_env.target}}-${{ matrix.build_env.subtarget}}"
+        with:
+          path: |
+            ~/bin/
+            ~/build_dir/
+            ~/staging_dir/
+            ~/dl/
+            ~/feeds/
+            ~/staging_dir/
+            ~/tmp/
+            ~/config
+            ~/.config
+            ~/.config.old
+            ~/version
+            ~/version.date
+
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('awg-openwrt/version.date') }}
+
+
+      - name: Building kernel and tools
+        if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
         run: |
           pkgarch=${{ matrix.build_env.pkgarch}}
           target=${{ matrix.build_env.target}}
@@ -43,13 +72,6 @@ jobs:
 
           make defconfig
 
-          echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
-
-          ./scripts/feeds update awgopenwrt
-          ./scripts/feeds install -a -p awgopenwrt
-
-          echo "    > make defconfig"
-          make defconfig
           echo "    > make tools/install"
           make tools/install
           echo "    > make toolchain/install"
@@ -57,6 +79,16 @@ jobs:
           # compile kernel module
           echo "    > make target/linux/compile"
           make target/linux/compile V=s
+
+      - name: Building AmneziaWG module
+        run: |
+
+          echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
+          ./scripts/feeds update awgopenwrt
+          ./scripts/feeds install -a -p awgopenwrt
+
+          echo "    > make defconfig"
+          make defconfig
 
           # Build kmod
           echo "    > make kmod-amneziawg (clean)"
