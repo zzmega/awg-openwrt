@@ -23,33 +23,16 @@ jobs:
           ref: ${{ matrix.tag }}
           fetch-depth: 0
 
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: awg-openwrt
-
       - name: Cache Tools and Kernel
         id: cache-tools-kernel
         uses: actions/cache@v3
         env:
           cache-name: "cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-${{ matrix.build_env.target}}-${{ matrix.build_env.subtarget}}"
         with:
-          path: |
-            ~/bin/
-            ~/build_dir/
-            ~/staging_dir/
-            ~/dl/
-            ~/feeds/
-            ~/staging_dir/
-            ~/tmp/
-            ~/config
-            ~/.config
-            ~/.config.old
-            ~/version
-            ~/version.date
-
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('awg-openwrt/version.date') }}
-
+          path: .
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          restore-keys: |
+            ${{ runner.os }}-build-
 
       - name: Building kernel and tools
         if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
