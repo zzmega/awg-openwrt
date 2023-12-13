@@ -70,20 +70,12 @@ jobs:
           ./scripts/feeds update awgopenwrt
           ./scripts/feeds install -a -p awgopenwrt
 
-          echo "    > make amnezia-wg-tools (clean)"
-          make package/amnezia-wg-tools/clean V=s
-          echo "    > make luci-app-amneziawg (clean)"
-          make package/luci-app-amneziawg/clean V=s
+          echo "CONFIG_PACKAGE_amnezia-wg-tools=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
+          make defconfig
 
-          echo "    > make amnezia-wg-tools (download)"
-          make package/amnezia-wg-tools/download V=s
-          echo "    > make luci-app-amneziawg (download)"
-          make package/luci-app-amneziawg/download V=s
-
-          echo "    > make amnezia-wg-tools (prepare)"
-          make package/amnezia-wg-tools/prepare V=s
-          echo "    > make luci-app-amneziawg (prepare)"
-          make package/luci-app-amneziawg/prepare V=s
+          make package/amnezia-wg-tools/{clean,download,prepare}
+          make package/luci-app-amneziawg/{clean,download,prepare}
 
           echo "    > make amnezia-wg-tools (compile)"
           make package/amnezia-wg-tools/compile V=s
