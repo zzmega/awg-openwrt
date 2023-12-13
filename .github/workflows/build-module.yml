@@ -86,14 +86,13 @@ jobs:
           make package/kmod-amneziawg/{clean,download,prepare}
 
           make package/amnezia-wg-tools/compile
-          make package/luci-app-amneziawg/compile
-
-          ls -al bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt
-
+          make package/luci-app-amneziawg/compile V=s
           make package/kmod-amneziawg/compile
 
+      - name: LS Packages
+        run: |
+          ls -al bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt
           ls -al bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/
-
 
       # - name: Release
       #   uses: softprops/action-gh-release@v1
