@@ -92,13 +92,13 @@ jobs:
 
           # Build kmod
           echo "    > make kmod-amneziawg (clean)"
-          make package/kmod-amneziawg/clean V=s
+          make package/kmod-amneziawg/clean
           echo "    > make kmod-amneziawg (download)"
-          make package/kmod-amneziawg/download V=s
+          make package/kmod-amneziawg/download
           echo "    > make kmod-amneziawg (prepare)"
-          make package/kmod-amneziawg/prepare V=s
+          make package/kmod-amneziawg/prepare
           echo "    > make kmod-amneziawg (compile)"
-          make package/kmod-amneziawg/compile V=s
+          make package/kmod-amneziawg/compile
 
           # print
           ls -al bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/
