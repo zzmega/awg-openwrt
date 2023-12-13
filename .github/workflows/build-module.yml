@@ -63,62 +63,37 @@ jobs:
           echo "    > make target/linux/compile"
           make target/linux/compile V=s
 
-      - name: Building AmneziaWG Tools and Luci
+      - name: Building AmneziaWG
         run: |
+          echo "CONFIG_PACKAGE_amnezia-wg-tools=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
+          make defconfig
+
+          # fixing feed
+          echo "src-git packages https://git.openwrt.org/feed/packages.git^0da9f622975aa1e4efe452da4acbae15479bee63" > ./feeds.conf.default
+          echo "src-git luci https://git.openwrt.org/project/luci.git^257f54cb8bcd493d9be0a45a3c316668b793e8ae" >> ./feeds.conf.default
+          echo "src-git routing https://git.openwrt.org/feed/routing.git^2272106e0839ee06957e88e3596489e1b510d3c2" >> ./feeds.conf.default
+          echo "src-git telephony https://git.openwrt.org/feed/telephony.git^9746ae8f964e18f04b64fbe1956366954ff223f8" >> ./feeds.conf.default
+          echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
+
           ./scripts/feeds update luci
           ./scripts/feeds install -a -p luci
           ./scripts/feeds update awgopenwrt
           ./scripts/feeds install -a -p awgopenwrt
 
-          echo "CONFIG_PACKAGE_amnezia-wg-tools=y" >> .config
-          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
-          make defconfig
-
           make package/amnezia-wg-tools/{clean,download,prepare}
           make package/luci-app-amneziawg/{clean,download,prepare}
+          make package/kmod-amneziawg/{clean,download,prepare}
 
-          echo "    > make amnezia-wg-tools (compile)"
-          make package/amnezia-wg-tools/compile V=s
-          echo "    > make luci-app-amneziawg (compile)"
-          make package/luci-app-amneziawg/compile V=s
+          make package/amnezia-wg-tools/compile
+          make package/luci-app-amneziawg/compile
 
-          ls -al bin/packages/${{ matrix.build_env.pkgarch }}/base
+          ls -al bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt
 
-      - name: Building AmneziaWG module
-        run: |
-          ls -al
-          # fixing feed
-
-          # echo "src-git packages https://git.openwrt.org/feed/packages.git^0da9f622975aa1e4efe452da4acbae15479bee63" > ./feeds.conf.default
-          # echo "src-git luci https://git.openwrt.org/project/luci.git^257f54cb8bcd493d9be0a45a3c316668b793e8ae" >> ./feeds.conf.default
-          # echo "src-git routing https://git.openwrt.org/feed/routing.git^2272106e0839ee06957e88e3596489e1b510d3c2" >> ./feeds.conf.default
-          # echo "src-git telephony https://git.openwrt.org/feed/telephony.git^9746ae8f964e18f04b64fbe1956366954ff223f8" >> ./feeds.conf.default
-          # echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
-
-          # ./scripts/feeds update awgopenwrt
-          # ./scripts/feeds install -a -p awgopenwrt
-
-          echo "    > make defconfig"
-          make defconfig
-
-          # Build kmod
-          echo "    > make kmod-amneziawg (clean)"
-          make package/kmod-amneziawg/clean
-          echo "    > make kmod-amneziawg (download)"
-          make package/kmod-amneziawg/download
-          echo "    > make kmod-amneziawg (prepare)"
-          make package/kmod-amneziawg/prepare V=s
-          echo "    > make kmod-amneziawg (compile)"
           make package/kmod-amneziawg/compile
 
-          # print
           ls -al bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/
 
-          # # Cleanup feeds for the cache
-          # echo "  > cleanup feeds"
-          # tac feeds.conf.default | tail -n +2 | tac > feeds.conf.default
-          # echo "  > print feeds"
-          # cat feeds.conf.default
 
       # - name: Release
       #   uses: softprops/action-gh-release@v1
