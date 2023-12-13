@@ -82,7 +82,7 @@ jobs:
 
       - name: Building AmneziaWG module
         run: |
-
+          ls -al
           echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
           ./scripts/feeds update awgopenwrt
           ./scripts/feeds install -a -p awgopenwrt
