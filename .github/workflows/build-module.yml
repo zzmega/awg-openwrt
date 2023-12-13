@@ -66,6 +66,12 @@ jobs:
       - name: Building AmneziaWG module
         run: |
           ls -al
+          # fixing feed
+          echo "src-git packages https://git.openwrt.org/feed/packages.git^0da9f622975aa1e4efe452da4acbae15479bee63 > ./feeds.conf.default
+          echo "src-git luci https://git.openwrt.org/project/luci.git^257f54cb8bcd493d9be0a45a3c316668b793e8ae >> ./feeds.conf.default
+          echo "src-git routing https://git.openwrt.org/feed/routing.git^2272106e0839ee06957e88e3596489e1b510d3c2 >> ./feeds.conf.default
+          echo "src-git telephony https://git.openwrt.org/feed/telephony.git^9746ae8f964e18f04b64fbe1956366954ff223f8 >> ./feeds.conf.default
+
           echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf.default
           ./scripts/feeds update awgopenwrt
           ./scripts/feeds install -a -p awgopenwrt
@@ -85,6 +91,12 @@ jobs:
 
           # print
           ls -al bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/
+
+          # Cleanup feeds for the cache
+          echo "  > cleanup feeds"
+          tac feeds.conf.default | tail -n +2 | tac > feeds.conf.default
+          echo "  > print feeds"
+          cat feeds.conf.default
 
       # - name: Release
       #   uses: softprops/action-gh-release@v1
