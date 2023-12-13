@@ -96,7 +96,7 @@ jobs:
           echo "    > make kmod-amneziawg (download)"
           make package/kmod-amneziawg/download
           echo "    > make kmod-amneziawg (prepare)"
-          make package/kmod-amneziawg/prepare
+          make package/kmod-amneziawg/prepare V=s
           echo "    > make kmod-amneziawg (compile)"
           make package/kmod-amneziawg/compile
 
