@@ -61,12 +61,12 @@ jobs:
           make defconfig
 
           echo "    > make tools/install"
-          make tools/install
+          make tools/install -i -j `nproc`
           echo "    > make toolchain/install"
-          make toolchain/install
+          make toolchain/install  -i -j `nproc`
           # compile kernel module
           echo "    > make target/linux/compile"
-          make target/linux/compile V=s
+          make target/linux/compile  -i -j `nproc` V=s
 
       # - name: Update feeds
       #   run: |
