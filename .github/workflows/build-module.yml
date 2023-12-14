@@ -83,24 +83,22 @@ jobs:
           echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
           make defconfig
 
-      # - name: Build amnezia-wg-tools
-      #   run: |
-      #     make package/amnezia-wg-tools/{clean,download,prepare}
-      #     make package/amnezia-wg-tools/compile
+      - name: Build amnezia-wg-tools
+        run: |
+          make package/amnezia-wg-tools/{clean,download,prepare}
+          make package/amnezia-wg-tools/compile
 
-      # - name: Build kmod-amneziawg
-      #   run: |
-      #     make package/kmod-amneziawg/{clean,download,prepare}
-      #     make package/kmod-amneziawg/compile
+      - name: Build kmod-amneziawg
+        run: |
+          make package/kmod-amneziawg/{clean,download,prepare}
+          make package/kmod-amneziawg/compile
 
       - name: Build luci
         run: |
-          cat .config | grep luci-app-amneziawg || true
-
           make package/luci-app-amneziawg/{clean,download,prepare}
           make package/luci-app-amneziawg/compile V=s
 
-      - name: LS Packages
+      - name: Prepare artifacts
         run: |
           rm feeds.conf
           ls -al bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt || true
