@@ -68,49 +68,39 @@ jobs:
           echo "    > make target/linux/compile"
           make target/linux/compile  -i -j `nproc` V=s
 
-      # - name: Update feeds
+      - name: Update feeds
+        run: |
+          cat .config
+          cp feeds.conf.default feeds.conf
+          echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
+
+          ./scripts/feeds update luci
+          ./scripts/feeds install -a -p luci
+          ./scripts/feeds update awgopenwrt
+          ./scripts/feeds install -a -p awgopenwrt
+
+      # - name: Build amnezia-wg-tools
       #   run: |
-      #     cp feeds.conf.default feeds.conf
-      #     echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
+      #     make package/amnezia-wg-tools/{clean,download,prepare}
+      #     make package/amnezia-wg-tools/compile
 
-      #     ./scripts/feeds update luci
-      #     ./scripts/feeds install -a -p luci
-      #     ./scripts/feeds update awgopenwrt
-      #     ./scripts/feeds install -a -p awgopenwrt
-
-      #     echo "CONFIG_PACKAGE_amnezia-wg-tools=y" >> .config
-      #     echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
-      #     make defconfig
-
-      # # - name: Build amnezia-wg-tools
-      # #   run: |
-      # #     make package/amnezia-wg-tools/{clean,download,prepare}
-      # #     make package/amnezia-wg-tools/compile
-
-      # # - name: Build kmod-amneziawg
-      # #   run: |
-      # #     make package/kmod-amneziawg/{clean,download,prepare}
-      # #     make package/kmod-amneziawg/compile
-
-      # - name: Build luci
+      # - name: Build kmod-amneziawg
       #   run: |
-      #     cat .config | grep luci-app-amneziawg || true
+      #     make package/kmod-amneziawg/{clean,download,prepare}
+      #     make package/kmod-amneziawg/compile
 
-      #     echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
-      #     make defconfig
+      - name: Build luci
+        run: |
+          cat .config | grep luci-app-amneziawg || true
 
-      #     cat .config
+          make package/luci-app-amneziawg/{clean,download,prepare}
+          make package/luci-app-amneziawg/compile V=s
 
-      #     rm -rf ./build_dir/target-mipsel_24kc_musl/luci-app-amneziawg
-
-      #     make package/luci-app-amneziawg/{clean,download,prepare}
-      #     make package/luci-app-amneziawg/compile V=s
-
-      # - name: LS Packages
-      #   run: |
-      #     rm feeds.conf
-      #     # ls -al bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt
-      #     # ls -al bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/
+      - name: LS Packages
+        run: |
+          rm feeds.conf
+          # ls -al bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt
+          # ls -al bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/
 
       # - name: Release
       #   uses: softprops/action-gh-release@v1
