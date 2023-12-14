@@ -65,9 +65,6 @@ jobs:
 
       - name: Update feeds
         run: |
-          echo "CONFIG_PACKAGE_amnezia-wg-tools=y" >> .config
-          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
-          make defconfig
 
           # fixing feed
           echo "src-git packages https://git.openwrt.org/feed/packages.git^0da9f622975aa1e4efe452da4acbae15479bee63" > ./feeds.conf.default
@@ -81,6 +78,10 @@ jobs:
           ./scripts/feeds update awgopenwrt
           ./scripts/feeds install -a -p awgopenwrt
 
+          echo "CONFIG_PACKAGE_amnezia-wg-tools=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
+          make defconfig
+
       # - name: Build amnezia-wg-tools
       #   run: |
       #     make package/amnezia-wg-tools/{clean,download,prepare}
@@ -93,7 +94,13 @@ jobs:
 
       - name: Build luci
         run: |
+          cat .config | grep luci-app-amneziawg || true
+
+          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
+          make defconfig
+
           cat .config | grep luci-app-amneziawg
+
           rm -rf ./build_dir/target-mipsel_24kc_musl/luci-app-amneziawg
 
           make package/luci-app-amneziawg/{clean,download,prepare}
