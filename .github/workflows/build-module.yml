@@ -99,7 +99,7 @@ jobs:
           echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
           make defconfig
 
-          cat .config | grep luci-app-amneziawg
+          cat .config
 
           rm -rf ./build_dir/target-mipsel_24kc_musl/luci-app-amneziawg
 
