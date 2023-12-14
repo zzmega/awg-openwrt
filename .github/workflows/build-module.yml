@@ -70,7 +70,6 @@ jobs:
 
       - name: Update feeds
         run: |
-          cat .config
           cp feeds.conf.default feeds.conf
           echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
 
@@ -78,6 +77,31 @@ jobs:
           ./scripts/feeds install -a -p luci
           ./scripts/feeds update awgopenwrt
           ./scripts/feeds install -a -p awgopenwrt
+
+          pkgarch=${{ matrix.build_env.pkgarch}}
+          target=${{ matrix.build_env.target}}
+          subtarget=${{ matrix.build_env.subtarget}}
+
+          echo "pkgarch: ${pkgarch}, target: ${target}, subtarget: ${subtarget}"
+
+          echo "CONFIG_TARGET_${target}=y" > .config
+          echo "CONFIG_TARGET_${target}_${subtarget}=y" >> .config
+          echo "CONFIG_DEFAULT_TARGET_${target}_${subtarget}=y" >> .config
+          echo "CONFIG_ALL_KMODS=y" >> .config
+
+          echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
+          echo "CONFIG_PACKAGE_amnezia-wg-tools=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
+
+          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
+
+          make defconfig
+
+
+
+          cat .config
 
       # - name: Build amnezia-wg-tools
       #   run: |
