@@ -11,11 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tag: ['v23.05.0']
+        tag: ['v23.05.0', 'v23.05.2']
         build_env:
           - pkgarch: mipsel_24kc
             target: ramips
+            subtarget: mt7620
+          - pkgarch: mipsel_24kc
+            target: ramips
             subtarget: mt7621
+          - pkgarch: arm_cortex-a7
+            target: mediatek
+            subtarget: mt7629
     steps:
       - uses: actions/checkout@v4
         with:
