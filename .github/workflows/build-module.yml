@@ -103,8 +103,8 @@ jobs:
 
       - name: Build amnezia-wg-tools
         run: |
-          make package/amnezia-wg-tools/{clean,download,prepare}
-          make package/amnezia-wg-tools/compile
+          make V=s package/amnezia-wg-tools/{clean,download,prepare}
+          make V=s package/amnezia-wg-tools/compile
 
       - name: Build kmod-amneziawg
         run: |
