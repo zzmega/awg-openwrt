@@ -15,7 +15,7 @@ PKG_RELEASE:=$(AUTORELEASE)
 
 PKG_SOURCE:=v$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/amnezia-vpn/amnezia-wg-tools/archive/refs/tags/
-PKG_HASH:=0d8cdf6d767700cb6d2cc895d45b1f94668663b00138627329766bb9e36d894e
+PKG_HASH:=cc4f523f7ec171b7bb3bdd1bcf4ff2f6833364fab6cad309310a84f33eeafa9b
 
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
