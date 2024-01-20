@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        #tag: ['v23.05.0', 'v23.05.2', 'v22.03.4']
-        tag: ['v22.03.4']
+        tag: ['v23.05.0', 'v23.05.2', 'v22.03.4']
+        #tag: ['v22.03.4']
         build_env:
           - pkgarch: mips_24kc
             target: ath79
@@ -101,34 +101,34 @@ jobs:
           echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
           make defconfig
 
-      - name: Build amnezia-wg-tools
-        run: |
-          make V=s package/amnezia-wg-tools/{clean,download,prepare}
-          make V=s package/amnezia-wg-tools/compile
+      # - name: Build amnezia-wg-tools
+      #   run: |
+      #     make V=s package/amnezia-wg-tools/{clean,download,prepare}
+      #     make V=s package/amnezia-wg-tools/compile
 
-      - name: Build kmod-amneziawg
-        run: |
-          make package/kmod-amneziawg/{clean,download,prepare}
-          make package/kmod-amneziawg/compile
+      # - name: Build kmod-amneziawg
+      #   run: |
+      #     make package/kmod-amneziawg/{clean,download,prepare}
+      #     make package/kmod-amneziawg/compile
 
-      - name: Build luci
-        run: |
-          make package/luci-app-amneziawg/{clean,download,prepare}
-          make package/luci-app-amneziawg/compile V=s
+      # - name: Build luci
+      #   run: |
+      #     make package/luci-app-amneziawg/{clean,download,prepare}
+      #     make package/luci-app-amneziawg/compile V=s
 
-      - name: Prepare artifacts
-        run: |
-          tag_name=${{  github.ref_name }}
-          mkdir -p awgrelease
-          postfix="${tag_name}_${{ matrix.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
-          cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/amnezia-wg-tools_*.ipk awgrelease/amnezia-wg-tools_${postfix}.ipk
-          cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/luci-app-amneziawg_*.ipk awgrelease/luci-app-amneziawg_${postfix}.ipk
-          cp bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg_*.ipk awgrelease/kmod-amneziawg_${postfix}.ipk
+      # - name: Prepare artifacts
+      #   run: |
+      #     tag_name=${{  github.ref_name }}
+      #     mkdir -p awgrelease
+      #     postfix="${tag_name}_${{ matrix.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
+      #     cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/amnezia-wg-tools_*.ipk awgrelease/amnezia-wg-tools_${postfix}.ipk
+      #     cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/luci-app-amneziawg_*.ipk awgrelease/luci-app-amneziawg_${postfix}.ipk
+      #     cp bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg_*.ipk awgrelease/kmod-amneziawg_${postfix}.ipk
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: awgrelease/*.ipk
+      # - name: Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: awgrelease/*.ipk
 
       - name: Cleanup
         run: |
