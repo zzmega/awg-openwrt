@@ -8,13 +8,13 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=amnezia-wg-tools
+PKG_NAME:=amneziawg-tools
 
 PKG_VERSION:=0.0.1-kmod
 PKG_RELEASE:=$(AUTORELEASE)
 
 PKG_SOURCE:=v$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://github.com/amnezia-vpn/amnezia-wg-tools/archive/refs/tags/
+PKG_SOURCE_URL:=https://github.com/amnezia-vpn/amneziawg-tools/archive/refs/tags/
 PKG_HASH:=cc4f523f7ec171b7bb3bdd1bcf4ff2f6833364fab6cad309310a84f33eeafa9b
 
 PKG_LICENSE:=GPL-2.0
@@ -26,7 +26,7 @@ include $(INCLUDE_DIR)/package.mk
 MAKE_PATH:=src
 MAKE_VARS += PLATFORM=linux
 
-define Package/amnezia-wg-tools
+define Package/amneziawg-tools
   CATEGORY:=Network
   URL:=https://www.wireguard.com
   MAINTAINER:=Jason A. Donenfeld <Jason@zx2c4.com>
@@ -36,7 +36,7 @@ define Package/amnezia-wg-tools
 	  +@BUSYBOX_CONFIG_FEATURE_IP_LINK
 endef
 
-define Package/amnezia-wg-tools/description
+define Package/amneziawg-tools/description
   WireGuard is a novel VPN that runs inside the Linux Kernel and utilizes
   state-of-the-art cryptography. It aims to be faster, simpler, leaner, and
   more useful than IPSec, while avoiding the massive headache. It intends to
@@ -48,7 +48,7 @@ define Package/amnezia-wg-tools/description
   `wg(8)`, a netifd protocol helper, and a re-resolve watchdog script.
 endef
 
-define Package/amnezia-wg-tools/install
+define Package/amneziawg-tools/install
 	$(INSTALL_DIR) $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/wg $(1)/usr/bin/amneziawg
 	$(INSTALL_BIN) ./files/amneziawg_watchdog $(1)/usr/bin/
@@ -56,4 +56,4 @@ define Package/amnezia-wg-tools/install
 	$(INSTALL_BIN) ./files/amneziawg.sh $(1)/lib/netifd/proto/
 endef
 
-$(eval $(call BuildPackage,amnezia-wg-tools))
+$(eval $(call BuildPackage,amneziawg-tools))
