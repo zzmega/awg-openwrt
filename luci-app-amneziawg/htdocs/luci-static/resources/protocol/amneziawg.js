@@ -385,8 +385,6 @@ return network.registerProtocol('amneziawg', {
 			    cancel = nodes.nextElementSibling.querySelector('.btn'),
 			    config = this.parseConfig(input);
 
-            console.log(input);
-
 			if (typeof(config) == 'string') {
 				error.firstChild.data = _('Cannot parse configuration: %s').format(config);
 				error.style.display = 'block';
@@ -748,6 +746,7 @@ return network.registerProtocol('amneziawg', {
 		o.createPeerConfig = function(section_id, endpoint, ips) {
 			var pub = s.formvalue(s.section, 'public_key'),
 			    port = s.formvalue(s.section, 'listen_port') || '51820',
+                jc = s.formvalue
 			    prv = this.section.formvalue(section_id, 'private_key'),
 			    psk = this.section.formvalue(section_id, 'preshared_key'),
 			    eport = this.section.formvalue(section_id, 'endpoint_port'),
