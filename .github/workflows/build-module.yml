@@ -12,17 +12,18 @@ jobs:
     strategy:
       matrix:
         #tag: ['v23.05.0', 'v23.05.2', 'v22.03.4']
-        tag: ['v22.03.4']
+        tag: ['v23.05.0']
+        # tag: ['v22.03.4']
         build_env:
-          - pkgarch: mips_24kc
-            target: ath79
-            subtarget: nand
+          # - pkgarch: mips_24kc
+          #   target: ath79
+          #   subtarget: nand
           # - pkgarch: mipsel_24kc
           #   target: ramips
           #   subtarget: mt7620
-          # - pkgarch: mipsel_24kc
-          #   target: ramips
-          #   subtarget: mt7621
+          - pkgarch: mipsel_24kc
+            target: ramips
+            subtarget: mt7621
           # - pkgarch: arm_cortex-a7
           #   target: mediatek
           #   subtarget: mt7629

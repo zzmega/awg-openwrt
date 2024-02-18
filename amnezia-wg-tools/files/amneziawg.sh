@@ -33,23 +33,23 @@ proto_amneziawg_init_config() {
 }
 
 proto_amneziawg_is_kernel_mode() {
-  if [ ! -e /sys/module/amneziawg ]; then
-    modprobe amneziawg > /dev/null 2&>1 || true
+	if [ ! -e /sys/module/amneziawg ]; then
+		modprobe amneziawg > /dev/null 2&>1 || true
 
-    if [ -e /sys/module/amneziawg ]; then
-      return 0
-    else
-      if [ ! command -v "${WG_QUICK_USERSPACE_IMPLEMENTATION:-amneziawg-go}" >/dev/null ]; then
-        ret=$?
-        echo "Please install either kernel module (kmod-amneziawg package) or user-space implementation in /usr/bin/amneziawg-go."
-        exit $?
-      else
-        return 1
-      fi
-    fi
-  else
-    return 0
-  fi
+		if [ -e /sys/module/amneziawg ]; then
+			return 0
+		else
+			if [ ! command -v "${WG_QUICK_USERSPACE_IMPLEMENTATION:-amneziawg-go}" >/dev/null ]; then
+				ret=$?
+				echo "Please install either kernel module (kmod-amneziawg package) or user-space implementation in /usr/bin/amneziawg-go."
+				exit $?
+			else
+				return 1
+			fi
+		fi
+	else
+		return 0
+	fi
 }
 
 proto_amneziawg_setup_peer() {
@@ -190,13 +190,13 @@ proto_amneziawg_setup() {
 	config_get awg_h3 "${config}" "awg_h3"
 	config_get awg_h4 "${config}" "awg_h4"
 
-	ip link del dev "${config}" 2>/dev/null
-
 	if proto_amneziawg_is_kernel_mode; then
 		logger -t "amneziawg" "info: using kernel-space kmod-amneziawg for ${WG}"
+  	ip link del dev "${config}" 2>/dev/null
 		ip link add dev "${config}" type amneziawg
 	else
 		logger -t "amneziawg" "info: using user-space amneziawg-go for ${WG}"
+		rm -f "/var/run/wireguard/${config}.sock"
 		amneziawg-go "${config}"
 	fi
 
@@ -245,7 +245,7 @@ proto_amneziawg_setup() {
 		echo "H4 = ${awg_h4}" >> "${wg_cfg}"
 	fi
 
-	config_foreach proto_amneziawg_setup_peer "wireguard_${config}"
+	config_foreach proto_amneziawg_setup_peer "amneziawg_${config}"
 
 	# apply configuration file
 	${WG} setconf ${config} "${wg_cfg}"
@@ -297,10 +297,10 @@ proto_amneziawg_teardown() {
 	local config="$1"
 	proto_amneziawg_check_installed
 	if proto_amneziawg_is_kernel_mode; then
-  	ip link del dev "${config}" >/dev/null 2>&1
-  else
-    rm -f /var/run/wireguard/${config}.sock
-  fi
+		ip link del dev "${config}" >/dev/null 2>&1
+	else
+		rm -f /var/run/wireguard/${config}.sock
+	fi
 }
 
 [ -n "$INCLUDE_ONLY" ] || {
