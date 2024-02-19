@@ -124,7 +124,7 @@ return network.registerProtocol('amneziawg', {
 	},
 
 	getOpkgPackage: function() {
-		return 'amnezia-wg-tools';
+		return 'amneziawg-tools';
 	},
 
 	isFloating: function() {
