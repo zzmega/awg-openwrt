@@ -10,7 +10,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=amnezia-wg-tools
 
-PKG_VERSION:=v1.0.20240213
+PKG_VERSION:=1.0.20240213
 PKG_RELEASE:=$(AUTORELEASE)
 
 PKG_SOURCE:=v$(PKG_VERSION).tar.gz
