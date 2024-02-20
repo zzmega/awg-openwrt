@@ -7,12 +7,12 @@ on:
 
 jobs:
   build:
-    name: "${{ matrix.tag }} - ${{ matrix.build_env.pkgarch}} :: ${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}} build"
+    name: "v${{ matrix.tag }} - ${{ matrix.build_env.pkgarch}} :: ${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}} build"
     runs-on: ubuntu-latest
     strategy:
       matrix:
         #tag: ['v23.05.0', 'v23.05.2', 'v22.03.4']
-        tag: ['v23.05.0']
+        tag: ['23.05.0']
         # tag: ['v22.03.4']
         build_env:
           # - pkgarch: mips_24kc
@@ -35,19 +35,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: openwrt/openwrt
-          ref: ${{ matrix.tag }}
+          ref: v${{ matrix.tag }}
           fetch-depth: 0
 
       - name: Cache Tools and Kernel
         id: cache-tools-kernel
         uses: actions/cache@v3
         env:
-          cache-name: "cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-${{ matrix.build_env.target}}-${{ matrix.build_env.subtarget}}"
+          cache-name: "cache-tools-kernel-v${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-${{ matrix.build_env.target}}-${{ matrix.build_env.subtarget}}"
         with:
           path: .
           key: ${{ runner.os }}-build-${{ env.cache-name }}
           restore-keys: |
-            ${{ runner.os }}-build-cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-
+            ${{ runner.os }}-build-cache-tools-kernel-v${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-
 
       - name: Building kernel and tools
         if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
@@ -142,7 +142,7 @@ jobs:
         run: |
           tag_name=${{  github.ref_name }}
           mkdir -p awgrelease
-          postfix="${tag_name}_${{ matrix.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
+          postfix="${tag_name}_v${{ matrix.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
           cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/amneziawg-tools_*.ipk awgrelease/amneziawg-tools_${postfix}.ipk
           cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/luci-app-amneziawg_*.ipk awgrelease/luci-app-amneziawg_${postfix}.ipk
           cp bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg_*.ipk awgrelease/kmod-amneziawg_${postfix}.ipk
