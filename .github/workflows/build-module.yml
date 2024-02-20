@@ -42,12 +42,12 @@ jobs:
         id: cache-tools-kernel
         uses: actions/cache@v3
         env:
-          cache-name: "cache-tools-kernel-v${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-${{ matrix.build_env.target}}-${{ matrix.build_env.subtarget}}"
+          cache-name: "cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-${{ matrix.build_env.target}}-${{ matrix.build_env.subtarget}}"
         with:
           path: .
           key: ${{ runner.os }}-build-${{ env.cache-name }}
           restore-keys: |
-            ${{ runner.os }}-build-cache-tools-kernel-v${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-
+            ${{ runner.os }}-build-cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-
 
       - name: Building kernel and tools
         if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
@@ -58,12 +58,11 @@ jobs:
 
           echo "pkgarch: ${pkgarch}, target: ${target}, subtarget: ${subtarget}"
 
-          wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${target}/${subtarget}/config.buildinfo -O .config
 
+          wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/config.buildinfo -O .config
           echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
           echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
           echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
-
           echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20=m" >> .config
           echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=m" >> .config
           echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
@@ -100,16 +99,11 @@ jobs:
           echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
           echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
           echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
-          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20=m" >> .config
-          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=m" >> .config
-          echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
 
           make defconfig
-          #
-          make target/linux/compile || true
-          echo "Kernel vermagic AFTER:"
-          cat ./build_dir/target-*/linux-*/linux-*/.vermagic
 
+          echo "Final Kernel vermagic:"
+          cat ./build_dir/target-*/linux-*/linux-*/.vermagic
 
       - name: Build amneziawg-tools
         run: |
