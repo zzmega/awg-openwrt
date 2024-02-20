@@ -48,8 +48,6 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}
           restore-keys: |
             ${{ runner.os }}-build-cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-
-            ${{ runner.os }}-build-cache-tools-kernel-${{ matrix.tag }}-
-            ${{ runner.os }}-build-
 
       - name: Building kernel and tools
         if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
@@ -60,10 +58,7 @@ jobs:
 
           echo "pkgarch: ${pkgarch}, target: ${target}, subtarget: ${subtarget}"
 
-          echo "CONFIG_TARGET_${target}=y" > .config
-          echo "CONFIG_TARGET_${target}_${subtarget}=y" >> .config
-          echo "CONFIG_DEFAULT_TARGET_${target}_${subtarget}=y" >> .config
-          echo "CONFIG_ALL_KMODS=y" >> .config
+          wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${target}/${subtarget}/config.buildinfo -O .config
 
           echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
           echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
@@ -82,6 +77,32 @@ jobs:
           # compile kernel module
           echo "    > make target/linux/compile"
           make target/linux/compile  -i -j `nproc` V=s
+
+          # Print kernel vermagic
+          echo "Kernel vermagic:"
+          cat ./build_dir/target-*/linux-*/linux-*/.vermagic
+
+
+      - name: Fix vermagic of cached kernel & tools
+        run: |
+          echo "Kernel vermagic BEFORE:"
+          cat ./build_dir/target-*/linux-*/linux-*/.vermagic
+          wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/config.buildinfo -O .config
+
+          echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
+          echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
+
+          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
+
+          make defconfig
+
+          make target/linux/compile || true
+
+          echo "Kernel vermagic AFTER:"
+          cat ./build_dir/target-*/linux-*/linux-*/.vermagic
 
       - name: Update feeds
         run: |
