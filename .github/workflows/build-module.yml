@@ -46,9 +46,9 @@ jobs:
           cache-name: "cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-${{ matrix.build_env.target}}-${{ matrix.build_env.subtarget}}"
         with:
           path: .
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          key: ${{ runner.os }}-build-vm-${{ env.cache-name }}
           restore-keys: |
-            ${{ runner.os }}-build-cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-
+            ${{ runner.os }}-build-vm-cache-tools-kernel-${{ matrix.tag }}-${{ matrix.build_env.pkgarch}}-
 
       - name: Building kernel and tools
         if: ${{ steps.cache-tools-kernel.outputs.cache-hit != 'true' }}
