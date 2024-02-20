@@ -91,10 +91,6 @@ jobs:
 
       - name: Update feeds
         run: |
-          # clean if cache restored from different cache key
-          rm -rf bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/ || true
-          rm -rf bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/  || true
-
           wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/feeds.buildinfo -O feeds.conf
           echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
 
