@@ -87,13 +87,10 @@ jobs:
           # clean if cache restored from different cache key
           rm -rf bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/ || true
           rm -rf bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/  || true
-          rm -rf ./build_dir
 
           cp feeds.conf.default feeds.conf
           echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
 
-          ./scripts/feeds update -a
-          ./scripts/feeds install -a
           ./scripts/feeds update luci
           ./scripts/feeds install -a -p luci
           ./scripts/feeds update awgopenwrt
@@ -108,7 +105,8 @@ jobs:
           echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
 
           make defconfig
-          make target/linux/compile V=s || true
+          #
+          make target/linux/compile || true
           echo "Kernel vermagic AFTER:"
           cat ./build_dir/target-*/linux-*/linux-*/.vermagic
 
