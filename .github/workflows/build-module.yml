@@ -55,8 +55,6 @@ jobs:
         run: |
           echo "pkgarch: ${{ matrix.build_env.pkgarch}}, target:${{ matrix.build_env.target}}, subtarget: ${{ matrix.build_env.subtarget}}"
 
-          ./scripts/feeds update
-          ./scripts/feeds install -a
           wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/config.buildinfo -O .config
           echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
           echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
@@ -77,6 +75,9 @@ jobs:
             echo Vermagic mismatch: $VERMAGIC, expected $VERMAGIC_EXPECTED
             exit 1
           fi
+
+          ./scripts/feeds update
+          ./scripts/feeds install -a
 
           echo "    > make tools/install"
           make tools/install -i -j `nproc`
