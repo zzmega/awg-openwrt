@@ -58,8 +58,7 @@ jobs:
           # Setup & install feeds
           wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/feeds.buildinfo -O feeds.conf
           echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
-          ./scripts/feeds update
-          ./scripts/feeds install -a
+          ./scripts/feeds update && ./scripts/feeds install -a
 
           # Setup config with AWG and dependencies
           wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/config.buildinfo -O .config
@@ -94,7 +93,7 @@ jobs:
             exit 1
           fi
 
-      - name: Build amneziawg-tools
+      - name: Build AmneziaWG
         run: |
           VERMAGIC=`cat ./build_dir/target-*/linux-*/linux-*/.vermagic`
           echo "Vermagic: $VERMAGIC"
@@ -106,18 +105,14 @@ jobs:
             exit 1
           fi
 
-          make V=s package/amneziawg-tools/{clean,download,prepare}
-          make V=s package/amneziawg-tools/compile
-
-      - name: Build kmod-amneziawg
-        run: |
           make package/kmod-amneziawg/{clean,download,prepare}
           make package/kmod-amneziawg/compile
 
-      - name: Build luci
-        run: |
           make package/luci-app-amneziawg/{clean,download,prepare}
           make package/luci-app-amneziawg/compile V=s
+
+          make V=s package/amneziawg-tools/{clean,download,prepare}
+          make V=s package/amneziawg-tools/compile
 
       - name: Prepare artifacts
         run: |
