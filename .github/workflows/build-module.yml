@@ -90,55 +90,59 @@ jobs:
             exit 1
           fi
 
-      # - name: Update feeds
-      #   run: |
-      #     wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/feeds.buildinfo -O feeds.conf
-      #     echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
+      - name: Update feeds
+        run: |
+          echo "Vermagic:"
+          cat ./build_dir/target-*/linux-*/linux-*/.vermagic
 
-      #     ./scripts/feeds update luci
-      #     ./scripts/feeds install -a -p luci
-      #     ./scripts/feeds update awgopenwrt
-      #     ./scripts/feeds install -a -p awgopenwrt
+          wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/feeds.buildinfo -O feeds.conf
+          echo "src-git awgopenwrt https://github.com/yury-sannikov/awg-openwrt.git" >> ./feeds.conf
 
-      #     wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/config.buildinfo -O .config
-      #     echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
-      #     echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
-      #     echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
-      #     echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
-      #     echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20=m" >> .config
-      #     echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=m" >> .config
-      #     echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
+          ./scripts/feeds update luci
+          ./scripts/feeds install -a -p luci
+          ./scripts/feeds update awgopenwrt
+          ./scripts/feeds install -a -p awgopenwrt
 
-      #     make defconfig
+          wget https://downloads.openwrt.org/releases/${{ matrix.tag }}/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/config.buildinfo -O .config
+          echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
+          echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-amneziawg=y" >> .config
+          echo "CONFIG_PACKAGE_kmod-amneziawg=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=m" >> .config
+          echo "CONFIG_PACKAGE_kmod-crypto-chacha20poly1305=m" >> .config
 
-      # - name: Build amneziawg-tools
-      #   run: |
-      #     make V=s package/amneziawg-tools/{clean,download,prepare}
-      #     make V=s package/amneziawg-tools/compile
+          make defconfig
+          make -j $(nproc) download world
 
-      # - name: Build kmod-amneziawg
-      #   run: |
-      #     make package/kmod-amneziawg/{clean,download,prepare}
-      #     make package/kmod-amneziawg/compile
+      - name: Build amneziawg-tools
+        run: |
+          make V=s package/amneziawg-tools/{clean,download,prepare}
+          make V=s package/amneziawg-tools/compile
 
-      # - name: Build luci
-      #   run: |
-      #     make package/luci-app-amneziawg/{clean,download,prepare}
-      #     make package/luci-app-amneziawg/compile V=s
+      - name: Build kmod-amneziawg
+        run: |
+          make package/kmod-amneziawg/{clean,download,prepare}
+          make package/kmod-amneziawg/compile
 
-      # - name: Prepare artifacts
-      #   run: |
-      #     tag_name=${{  github.ref_name }}
-      #     mkdir -p awgrelease
-      #     postfix="${tag_name}_v${{ matrix.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
-      #     cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/amneziawg-tools_*.ipk awgrelease/amneziawg-tools_${postfix}.ipk
-      #     cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/luci-app-amneziawg_*.ipk awgrelease/luci-app-amneziawg_${postfix}.ipk
-      #     cp bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg_*.ipk awgrelease/kmod-amneziawg_${postfix}.ipk
+      - name: Build luci
+        run: |
+          make package/luci-app-amneziawg/{clean,download,prepare}
+          make package/luci-app-amneziawg/compile V=s
 
-      # - name: Release
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     files: awgrelease/*.ipk
+      - name: Prepare artifacts
+        run: |
+          tag_name=${{  github.ref_name }}
+          mkdir -p awgrelease
+          postfix="${tag_name}_v${{ matrix.tag }}_${{ matrix.build_env.pkgarch}}_${{ matrix.build_env.target}}_${{ matrix.build_env.subtarget}}"
+          cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/amneziawg-tools_*.ipk awgrelease/amneziawg-tools_${postfix}.ipk
+          cp bin/packages/${{ matrix.build_env.pkgarch }}/awgopenwrt/luci-app-amneziawg_*.ipk awgrelease/luci-app-amneziawg_${postfix}.ipk
+          cp bin/targets/${{ matrix.build_env.target}}/${{ matrix.build_env.subtarget}}/packages/kmod-amneziawg_*.ipk awgrelease/kmod-amneziawg_${postfix}.ipk
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: awgrelease/*.ipk
 
       - name: Cleanup
         run: |
