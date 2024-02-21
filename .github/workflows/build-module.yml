@@ -95,6 +95,8 @@ jobs:
 
       - name: Build AmneziaWG
         run: |
+          make target/linux/compile  -i -j `nproc` V=s
+
           VERMAGIC=`cat ./build_dir/target-*/linux-*/linux-*/.vermagic`
           echo "Vermagic: $VERMAGIC"
 
@@ -105,8 +107,8 @@ jobs:
             exit 1
           fi
 
-          make package/kmod-amneziawg/{clean,download,prepare}
-          make package/kmod-amneziawg/compile
+          make package/kmod-amneziawg/{clean,download,prepare} V=s
+          make package/kmod-amneziawg/compile V=s
 
           make package/luci-app-amneziawg/{clean,download,prepare}
           make package/luci-app-amneziawg/compile V=s
